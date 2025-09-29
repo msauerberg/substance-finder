@@ -1,0 +1,69 @@
+<!-- templates/result.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Processing result</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; max-width: 1000px; }
+    table.stat { border-collapse: collapse; margin-bottom: 1rem; width: 480px; }
+    table.stat td, table.stat th { border: 1px solid #ddd; padding: 8px; }
+    table.stat th { background:#f3f3f3; text-align:left; }
+    .muted { color:#666; font-size:0.9rem; }
+    .missing-list { margin-top: 0.5rem; padding: 0.5rem; background:#fafafa; border:1px solid #eee; max-width:600px; }
+    img.chart { border: 1px solid #eee; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Processing result</h1>
+
+  {% if error %}
+    <p style="color: red;">Error: {{ error }}</p>
+    <p><a href="/">Back to upload</a></p>
+  {% else %}
+    <h2>Summary</h2>
+
+    <table class="stat" role="table" aria-label="Processing statistics">
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Total rows</td><td>{{ stats.total_rows }}</td></tr>
+      <tr><td>Missing matches</td>
+        <td>{{ stats.missing_count }} ({{ stats.missing_pct }}%)</td></tr>
+      <tr><td>Unique values (examined)</td><td>{{ stats.unique_total_values }}</td></tr>
+      <tr><td>Unique missing values</td>
+        <td>{{ stats.unique_missing_count }} ({{ stats.unique_missing_pct }}%)</td></tr>
+      <tr><td>Processing time (s)</td><td>{{ stats.processing_seconds }}</td></tr>
+      <tr><td>Output columns</td><td class="muted">{{ stats.columns_out }}</td></tr>
+    </table>
+
+    <h3>Match overview</h3>
+    {% if plot_base64 %}
+    <img class="chart" src="data:image/png;base64,{{ plot_base64 }}" alt="Matches chart" />
+    {% else %}
+      <p class="muted">Chart not available.</p>
+    {% endif %}
+
+      <h3>Unique missing examples (top 20)</h3>
+    {% if stats.unique_missing_examples and stats.unique_missing_examples | length > 0 %}
+      <div class="missing-list">
+        <strong>{{ stats.unique_missing_examples|length }} unique missing examples (most frequent first):</strong>
+        <ul>
+          {% for pair in stats.unique_missing_examples %}
+            {# pair is a tuple (value, count) #}
+            <li>{{ pair[0] }} — {{ pair[1] }} times</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <p>No missing values found (all inputs matched at least one reference).</p>
+    {% endif %}
+
+
+    <p style="margin-top:1rem;">
+      <p>Download token: <code>{{ download_token }}</code></p>
+      <p><a href="/download?token={{ download_token }}">Download processed CSV</a></p>
+    </p>
+
+    <p><a href="/">Run again with other files</a></p>
+  {% endif %}
+</body>
+</html>

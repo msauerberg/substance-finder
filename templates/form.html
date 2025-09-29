@@ -1,0 +1,101 @@
+<!-- templates/form.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Substance Finder App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; max-width: 900px; color: #222; }
+    h1 { margin-bottom: 1rem; }
+    label { display:block; margin-top: .4rem; font-weight: 600; }
+    .group { margin-bottom: 1rem; padding: .8rem; border: 1px solid #eee; background:#fafafa; border-radius:6px; }
+    .row { display:flex; gap: 1rem; align-items:flex-start; flex-wrap:wrap; }
+    .row > div { flex: 1 1 300px; min-width: 220px; }
+    input[type="text"], input[type="number"], input[type="file"] {
+      width: 100%;
+      padding: 6px 8px;
+      margin-top: 6px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    fieldset.group { border: 1px solid #e5e5e5; padding: .8rem; border-radius:6px; background:#fff; }
+    legend { font-weight:700; padding: 0 .5rem; }
+    small.desc {
+      display:block;
+      color: #555;
+      margin-top: 0.35rem;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+    .help-inline { color:#666; font-size:0.9rem; margin-top:0.35rem; display:block; }
+    .submit-row { margin-top: 1rem; }
+    button { background:#0b79d0; color:white; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-size:1rem; }
+    button:hover { background:#0964a8; }
+  </style>
+</head>
+<body>
+  <h1>Substance Finder — Upload files</h1>
+
+  <form action="/process" method="post" enctype="multipart/form-data">
+    <div class="group">
+      <label for="data_file">Data CSV (free-text field to process)</label>
+      <input id="data_file" type="file" name="data_file" accept=".csv" required />
+      <small class="desc">Upload the CSV that contains the free-text column with substance mentions (use semicolon-separated files).</small>
+    </div>
+
+    <div class="group">
+      <label for="ref_file">Reference CSV (valid substances list)</label>
+      <input id="ref_file" type="file" name="ref_file" accept=".csv" required />
+      <small class="desc">Upload the CSV that contains the canonical list of substances used for matching (use semicolon-separated files).</small>
+    </div>
+
+    <fieldset class="group">
+      <legend>Column selection</legend>
+      <div class="row">
+        <div>
+          <label for="substance_col">Column name in data CSV (input column)</label>
+          <input id="substance_col" type="text" name="substance_col" value="Bezeichnung" />
+          <small class="desc">Enter the exact column name from the data CSV that contains the raw substance text. Default: <code>Bezeichnung</code>.</small>
+        </div>
+
+        <div>
+          <label for="ref_substance_col">Column name in reference CSV</label>
+          <input id="ref_substance_col" type="text" name="ref_substance_col" value="Substanz" />
+          <small class="desc">Enter the column name from the reference CSV that contains the canonical substance names. Default: <code>Substanz</code>.</small>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend>Matching parameters</legend>
+      <div class="row">
+        <div>
+          <label for="threshold">Threshold (similarity, 0.0 – 1.0)</label>
+          <input id="threshold" type="text" name="threshold" value="0.85" />
+          <small class="desc">Controls fuzzy-match sensitivity. Higher = stricter matching. Typical values: 0.8–0.95.</small>
+        </div>
+
+        <div>
+          <label for="max_per_match_id">Max matches per ID</label>
+          <input id="max_per_match_id" type="number" name="max_per_match_id" value="2" min="1" />
+          <small class="desc">Maximum number of matched reference items returned per input. Example: an input may have several close variants; set how many to keep.</small>
+        </div>
+
+        <div>
+          <label for="only_first_match" style="font-weight:600;">Only first match</label>
+          <div style="display:flex; align-items:center; gap:.6rem; margin-top:.3rem;">
+            <input id="only_first_match" type="checkbox" name="only_first_match" checked />
+            <span class="help-inline">If checked, only the single best match per input is returned (recommended for simple recoding).</span>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="submit-row">
+      <button type="submit">Upload & Run matching</button>
+    </div>
+  </form>
+</body>
+</html>
