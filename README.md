@@ -123,7 +123,7 @@ You can run the app in **two ways**:
 
 ### Output File
 
-![Output File](docs/screenshots/output_file.png)
+![Output File](docs/screenshots/output_data.png)
 
 ------------------------------------------------------------------------
 
