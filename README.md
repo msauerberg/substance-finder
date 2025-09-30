@@ -52,7 +52,7 @@ You can run the app in **two ways**:
 1.  Clone this repository:
 
     ``` bash
-    git clone https://github.com/<your-username>/substance-finder.git
+    git clone https://github.com/msauerberg/substance-finder.git
     cd substance-finder
     ```
 
@@ -80,19 +80,26 @@ You can run the app in **two ways**:
 
 ### 🔹 2. Run with Docker (recommended)
 
-1.  Build the image:
+1.  Clone this repository:
+
+    ``` bash
+    git clone https://github.com/msauerberg/substance-finder.git
+    cd substance-finder
+    ```
+
+2.  Build the image:
 
     ``` bash
     docker build -t substance-finder .
     ```
 
-2.  Run the container:
+3.  Run the container:
 
     ``` bash
     docker run -it --rm -p 8000:8000 substance-finder
     ```
 
-3.  Open in your browser:
+4.  Open in your browser:
 
         http://localhost:8000
 
