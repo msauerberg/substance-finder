@@ -40,8 +40,8 @@ COPY . /app
 ENV MPLBACKEND="Agg"
 
 # Expose port used by the app
-EXPOSE 8000
+EXPOSE 8020
 
 # Default command: run with gunicorn (4 workers). Use app:app as Flask instance.
 # If you prefer development server (auto-reload), change this to: ["python","app.py"]
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app", "--timeout", "120"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8020", "app:app", "--timeout", "120"]

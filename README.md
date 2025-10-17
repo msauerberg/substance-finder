@@ -74,7 +74,7 @@ You can run the app in **two ways**:
 
 4.  Open your browser at:
 
-        http://localhost:8000
+        http://localhost:8020
 
 ------------------------------------------------------------------------
 
@@ -96,12 +96,12 @@ You can run the app in **two ways**:
 3.  Run the container:
 
     ``` bash
-    docker run -it --rm -p 8000:8000 substance-finder
+    docker run -it --rm -p 8020:8020 substance-finder
     ```
 
 4.  Open in your browser:
 
-        http://localhost:8000
+        http://localhost:8020
 
 ------------------------------------------------------------------------
 
