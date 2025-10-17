@@ -151,20 +151,31 @@ def get_matches(
     It is recommanded to use a rather high threshold parameter because substance
     names are often very similar to each other.
     """
+    import spacy
+    from spaczz.matcher import FuzzyMatcher
+    import re
+
+    # create blank German nlp as before
     nlp = spacy.blank("de")
     matcher = FuzzyMatcher(nlp.vocab)
 
+    # Use partial_token fuzzy function and pass min_r derived from threshold.
+    # min_r is expected as percentage (e.g. 85), so convert threshold (0.85) -> 85
+    min_r_value = int(threshold * 100)
+
     for sub in ref_substance.dropna().astype(str):
-        matcher.add(sub, [nlp(sub)])
+        # one kwargs dict per pattern (we add one pattern -> one dict)
+        matcher.add(sub, [nlp(sub)], kwargs=[{"fuzzy_func": "partial_token", "min_r": min_r_value}])
 
     results = []
 
     for _, row in preprocessed_data.iterrows():
-        text = row["Preprocessed_text"] #uses preprocessed text for FuzzyMatcher
+        text = row["Preprocessed_text"]  # uses preprocessed text for FuzzyMatcher
         original = row["Original"]
         doc = nlp(text)
         matches = matcher(doc)
 
+        # keep original filtering behaviour (ratio is 0-100)
         matches_filtered = [m for m in matches if m[3] >= threshold * 100]
         matches_sorted = sorted(matches_filtered, key=lambda x: x[3], reverse=True)
 
@@ -180,7 +191,7 @@ def get_matches(
 
             result_row[f"Hit{match_idx}"] = doc[start:end].text
             result_row[f"Mapped_to{match_idx}"] = match_id
-            result_row[f"Similarity{match_idx}"] = ratio/100
+            result_row[f"Similarity{match_idx}"] = ratio / 100
 
             match_id_counts[match_id] = count + 1
             match_idx += 1
@@ -199,6 +210,7 @@ def get_matches(
         return dta_col_selected
 
     return out
+
 
 
 def create_substance_service_var(
