@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SubstanceMapper</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon">⚗</span>
+        <span class="logo-text">SubstanceMapper</span>
+      </div>
+      <nav class="nav">
+        <a href="#upload" class="nav-link active" data-section="upload">① Upload &amp; Configure</a>
+        <a href="#results" class="nav-link" data-section="results">② Results &amp; Stats</a>
+      </nav>
+      <div class="sidebar-footer">
+        Fuzzy substance extraction<br/>from clinical free text
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+
+      <!-- ── SECTION 1: Upload ── -->
+      <section id="upload" class="section active">
+        <header class="section-header">
+          <h1>Upload Files &amp; Configure</h1>
+          <p class="subtitle">Upload your data file, a reference list of canonical substance names, and (optionally) a lookup/synonym table.</p>
+        </header>
+
+        <form id="jobForm" novalidate>
+
+          <!-- Row 1: data file + ref file -->
+          <div class="card-grid">
+
+            <div class="card">
+              <h2 class="card-title">📄 Data File <span class="required">*</span></h2>
+              <p class="card-desc">CSV or Excel file containing your free-text substance descriptions.</p>
+              <label class="file-drop" id="dataDropZone">
+                <input type="file" name="data_file" id="data_file" accept=".csv,.xlsx,.xls" required hidden />
+                <span class="drop-icon">📂</span>
+                <span class="drop-label" id="data_file_label">Drop file here or click to browse</span>
+              </label>
+              <div class="field-group mt">
+                <label for="substance_col">Column with substance text <span class="required">*</span></label>
+                <input type="text" name="substance_col" id="substance_col" placeholder="e.g. substance_text" required />
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">📋 Reference List <span class="required">*</span></h2>
+              <p class="card-desc">CSV or Excel file with canonical substance names to match against.</p>
+              <label class="file-drop" id="refDropZone">
+                <input type="file" name="ref_file" id="ref_file" accept=".csv,.xlsx,.xls" required hidden />
+                <span class="drop-icon">📂</span>
+                <span class="drop-label" id="ref_file_label">Drop file here or click to browse</span>
+              </label>
+              <div class="field-group mt">
+                <label for="ref_col">Column with substance names <span class="required">*</span></label>
+                <input type="text" name="ref_col" id="ref_col" placeholder="e.g. substanz" required />
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Row 2: lookup table (optional) -->
+          <div class="card collapsible">
+            <button type="button" class="collapse-toggle" id="lookupToggle">
+              <span>🔗 Lookup / Synonym Table <span class="badge">Optional</span></span>
+              <span class="chevron">▸</span>
+            </button>
+            <div class="collapse-body" id="lookupBody" style="display:none">
+              <p class="card-desc">A table mapping alternative names or ATC codes (column: <code>label</code>) to canonical substance names (column: <code>substance</code>). Optionally provide an <code>ATC_code</code> column (1/0).</p>
+              <label class="file-drop" id="lookupDropZone">
+                <input type="file" name="lookup_file" id="lookup_file" accept=".csv,.xlsx,.xls" hidden />
+                <span class="drop-icon">📂</span>
+                <span class="drop-label" id="lookup_file_label">Drop file here or click to browse</span>
+              </label>
+              <div class="field-row mt">
+                <div class="field-group">
+                  <label for="lookup_label_col">Label column name</label>
+                  <input type="text" name="lookup_label_col" id="lookup_label_col" placeholder="label" />
+                </div>
+                <div class="field-group">
+                  <label for="lookup_substance_col">Substance column name</label>
+                  <input type="text" name="lookup_substance_col" id="lookup_substance_col" placeholder="substance" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: parameters -->
+          <div class="card">
+            <h2 class="card-title">⚙ Matching Parameters</h2>
+            <div class="param-grid">
+
+              <div class="field-group">
+                <label for="threshold">
+                  Similarity threshold
+                  <span class="hint" title="Minimum fuzzy-match ratio (0–1). Higher = stricter.">ⓘ</span>
+                </label>
+                <div class="range-row">
+                  <input type="range" id="threshold" name="threshold" min="0.5" max="1.0" step="0.01" value="0.85" oninput="document.getElementById('thresholdVal').textContent=this.value" />
+                  <span class="range-val" id="thresholdVal">0.85</span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="max_per_match">
+                  Max hits per substance
+                  <span class="hint" title="Maximum times the same resolved substance name can appear per row.">ⓘ</span>
+                </label>
+                <input type="number" id="max_per_match" name="max_per_match" min="1" max="10" value="2" />
+              </div>
+
+              <div class="field-group">
+                <label for="only_first_match">
+                  Return only top match
+                  <span class="hint" title="If checked, only the best match per row is returned. Uncheck for all matches.">ⓘ</span>
+                </label>
+                <label class="toggle">
+                  <input type="checkbox" id="only_first_match" name="only_first_match" value="true" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="submit-row">
+            <div id="formError" class="form-error" style="display:none"></div>
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+              🚀 Start Matching
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Progress panel (hidden until job starts) -->
+        <div class="card progress-card" id="progressCard" style="display:none">
+          <h2 class="card-title">⏳ Processing…</h2>
+          <p id="progressLabel">Initialising…</p>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+          </div>
+          <p class="progress-pct" id="progressPct">0%</p>
+        </div>
+
+      </section>
+
+      <!-- ── SECTION 2: Results ── -->
+      <section id="results" class="section" style="display:none">
+        <header class="section-header">
+          <h1>Results &amp; Statistics</h1>
+          <button class="btn btn-ghost" id="newJobBtn">← New Job</button>
+        </header>
+
+        <!-- Stats grid -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Similarity distribution chart -->
+        <div class="card" id="simChartCard" style="display:none">
+          <h2 class="card-title">📊 Similarity Score Distribution</h2>
+          <div class="bar-chart" id="simBarChart"></div>
+        </div>
+
+        <!-- Preview table -->
+        <div class="card">
+          <div class="table-header-row">
+            <h2 class="card-title">🔍 Preview (first 10 rows)</h2>
+            <a id="downloadLink" class="btn btn-primary" href="#" download>⬇ Download CSV</a>
+          </div>
+          <div class="table-wrapper">
+            <table id="previewTable">
+              <thead id="previewHead"></thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

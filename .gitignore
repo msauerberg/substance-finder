@@ -1,0 +1,7 @@
+__pycache__
+.venv
+results/*.csv
+test_data
+*.zip
+docker-compose.yml
+files
