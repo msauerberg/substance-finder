@@ -67,8 +67,8 @@ substance_app/
 
 CSV files are auto-detected for `;`, `,`, or tab separators.
 
-![Screentshot1](Images/Screenshot 2026-05-11 100407.png)
-![Screentshot2](Images/Screenshot 2026-05-11 100545.png)
+![Screentshot1](Images/Screenshot1.png)
+![Screentshot2](Images/Screenshot2.png)
 
 ## Output columns
 
@@ -79,4 +79,4 @@ CSV files are auto-detected for `;`, `,`, or tab separators.
 | `Extracted_Substance` | Best matched canonical name (or all matches if multi-match mode) |
 | `Similarity` | Match score in [0, 1] |
 
-![Screentshot3](Images/Screenshot 2026-05-11 100654.png)
+![Screentshot3](Images/Screenshot3.png)
